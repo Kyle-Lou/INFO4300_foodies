@@ -1,4 +1,4 @@
-env/*
+env/
 .DS_Store
 Docker/__pycache__
 
@@ -17,3 +17,4 @@ dist/
 build/
 *.egg-info/
 helpers/*
+json_template/
