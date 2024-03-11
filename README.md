@@ -1,4 +1,4 @@
-# 4300-Flask-Template
+# 4300-Flask-Template-JSON
 
 ## Contents
 
@@ -33,7 +33,7 @@ For the initial deployment, only one member of your team needs to follow the ste
 - When you login, ensure your dashboard has the following data filled from the image below (check the black arrows only)
   - The GitHub URL field will not be filled in for you, so you should add in the URL of your forked repository.
 
-![4300showcase infosci cornell edu_9090_ (2)](https://user-images.githubusercontent.com/55399795/226429682-2f8f2b31-9447-42b2-8b29-889259efc219.png)
+![image](https://github.com/CornellNLP/4300-Flask-Template-JSON/assets/42887079/4c4c8004-c82f-4660-9af1-0cc898721013)
 
 
 ### Step 2: Understanding the interface
