@@ -27,15 +27,14 @@ def json_search(query):
     matches = []
     for i in range(len(data)):
        if query.lower() in data[i]['title'].lower():
-           matches.append(data[i]['title'])
-    print(matches)
+           matches.append(data[i])
     return matches
 
 @app.route("/")
 def home():
     return render_template('base.html',title="sample html")
 
-@app.route("/episodes")
+@app.route("/snacks")
 def episodes_search():
     text = request.args.get("title")
     return json_search(text)
