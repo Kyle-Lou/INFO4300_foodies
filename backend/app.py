@@ -3,6 +3,8 @@ import os
 from flask import Flask, render_template, request
 from flask_cors import CORS
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 
 # ROOT_PATH for linking with all your files. 
@@ -24,12 +26,30 @@ CORS(app)
 
 # Sample search using json with pandas
 def json_search(query):
-    matches = []
-    for i in range(len(data)):
-       if query.lower() in data[i]['title'].lower():
-           matches.append(data[i])
-    return matches
+    # Initialize matched_entry as None
+    matched_entry = None
 
+    # Loop through each item in data to find a match by title
+    for item in data:
+        if item['title'].lower() == query.lower():
+            matched_entry = item
+            break
+    if matched_entry is None:
+        print("The input in the search bar can't match an exact title in the existing dataset")
+        return []
+    descriptions = [matched_entry['description']]
+    for item in data:
+        if item['title'].lower() != query.lower():
+            descriptions.append(item['description'])
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform(descriptions)
+    cos_similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:])
+    top_indices = cos_similarities.argsort()[0][-3:][::-1]
+    top_matches = []
+    for i in top_indices:
+        top_matches.append(data[i+1])
+    return top_matches
+    
 @app.route("/")
 def home():
     return render_template('base.html',title="sample html")
