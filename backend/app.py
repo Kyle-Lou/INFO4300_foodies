@@ -1,6 +1,6 @@
 import json
 import os
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -24,40 +24,52 @@ with open(json_file_path, 'r') as file:
 app = Flask(__name__)
 CORS(app)
 
-# Sample search using json with pandas
-def json_search(query):
-    # Initialize matched_entry as None
-    matched_entry = None
+def autocomplete_search(query):
+    suggestions = []
 
-    # Loop through each item in data to find a match by title
     for item in data:
-        if item['title'].lower() == query.lower():
-            matched_entry = item
-            break
-    if matched_entry is None:
-        print("The input in the search bar can't match an exact title in the existing dataset")
+        if query.lower() in item['title'].lower():
+            suggestions.append(item)
+
+            if len(suggestions) >= 10: 
+                break
+
+    return suggestions
+
+def detailed_search(title):
+    matched_entry = next((item for item in data if item['title'].lower() == title.lower()), None)
+    if not matched_entry:
         return []
-    descriptions = [matched_entry['description']]
-    for item in data:
-        if item['title'].lower() != query.lower():
-            descriptions.append(item['description'])
+
+    descriptions = [matched_entry['description']] + [item['description'] for item in data if item['title'].lower() != title.lower()]
     vectorizer = TfidfVectorizer()
     tfidf_matrix = vectorizer.fit_transform(descriptions)
     cos_similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:])
-    top_indices = cos_similarities.argsort()[0][-3:][::-1]
-    top_matches = []
-    for i in top_indices:
-        top_matches.append(data[i+1])
+    top_indices = cos_similarities.argsort()[0][-3:][::-1]  
+
+    top_matches = [data[i + 1] for i in top_indices] 
     return top_matches
+
     
 @app.route("/")
 def home():
     return render_template('base.html',title="sample html")
 
-@app.route("/snacks")
-def episodes_search():
-    text = request.args.get("title")
-    return json_search(text)
+# @app.route("/snacks")
+# def episodes_search():
+#     text = request.args.get("title")
+#     return json_search(text)
+
+@app.route("/autocomplete")
+def autocomplete():
+    query = request.args.get("title", "")
+    return jsonify(autocomplete_search(query))
+
+@app.route("/search")
+def search():
+    title = request.args.get("title", "")
+    return jsonify(detailed_search(title))
+
 
 
 if 'DB_NAME' not in os.environ:

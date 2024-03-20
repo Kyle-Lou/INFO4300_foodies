@@ -20,9 +20,30 @@
                 <h1 id="google-3">e</h1>
                 <h1 id="google-0-1">r</h1>
             </div>
-            <div class="input-box" onclick="sendFocus()">
-                <img src="{{ url_for('static', filename='images/mag.png') }}" />
-                <input placeholder="Search for your snack" id="filter-text-val" onkeyup="filterText()">
+            <div class="top-section">
+                <div class="input-box" onclick="sendFocus()">
+                    <img src="{{ url_for('static', filename='images/mag.png') }}" />
+                    <input placeholder="Search for your snack" id="filter-text-val" onkeyup="filterText()">
+                    <div id="autocomplete-list" class="autocomplete-items"></div>
+                </div>
+                <div class="checkbox-container">
+                    <div class="checkbox-group" id="allergies-group">
+                        <label><input type="checkbox" id="allergiesCheckbox" onclick="toggleAllergies()"> Allergies?</label>
+                        <div id="allergyOptions" style="display:none; margin-left:20px;">
+                            <label><input type="checkbox" name="allergies" value="nuts"> Nuts</label>
+                            <label><input type="checkbox" name="allergies" value="dairy"> Dairy</label>
+                            <label><input type="checkbox" name="allergies" value="gluten"> Gluten</label>
+                        </div>
+                    </div>
+                    <div class="checkbox-group" id="ingredients-group">
+                        <label><input type="checkbox" id="ingredientsCheckbox" onclick="toggleIngredients()"> Preferred Ingredients?</label>
+                        <div id="ingredientsOptions" style="display:none; margin-left:20px;">
+                            <label><input type="checkbox" name="ingredients" value="chocolate"> Chocolate</label>
+                            <label><input type="checkbox" name="ingredients" value="cheese"> Cheese</label>
+                            <label><input type="checkbox" name="ingredients" value="spice"> Spicy Flavoring</label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="answer-box">
@@ -45,23 +66,79 @@
             </div>`
         }
 
+        function toggleAllergies() {
+            var checkBox = document.getElementById("allergiesCheckbox")
+            var allergiesOptions = document.getElementById("allergyOptions");
+            
+            if (checkBox.checked) {
+                allergiesOptions.style.display = "block"
+            } else {
+                allergiesOptions.style.display = "none"
+            }
+        }
+
+        function toggleIngredients() {
+            var checkBox = document.getElementById("ingredientsCheckbox")
+            var allergiesOptions = document.getElementById("ingredientsOptions");
+            
+            if (checkBox.checked) {
+                ingredientsOptions.style.display = "block"
+            } else {
+                ingredientsOptions.style.display = "none"
+            }
+        }
+
         function sendFocus(){
             document.getElementById('filter-text-val').focus()
         }
 
-        function filterText(){
-            document.getElementById("answer-box").innerHTML = ""
-            console.log(document.getElementById("filter-text-val").value)
-            fetch("/snacks?" + new URLSearchParams({ title: document.getElementById("filter-text-val").value }).toString())
-            .then((response) => response.json())
-            .then((data) => data.forEach(row => {
-                
-                let tempDiv = document.createElement("div")
-                tempDiv.innerHTML = answerBoxTemplate(row['id'],row['title'], row['rating'], row['price'], row['ingredients'], row['image'])
-                document.getElementById("answer-box").appendChild(tempDiv)
-            }));
+        function filterText() {
+            var input = document.getElementById("filter-text-val");
+            var filter = input.value;
+            var autocompleteList = document.getElementById("autocomplete-list");
+            var preferIngr = document.getElementById("pref-ingrd")
+            var answerBox = document.getElementById("answer-box");
 
+            autocompleteList.innerHTML = "";
+
+            if (!filter || filter.length === 1) {
+                answerBox.innerHTML = "";
+            }
+
+            if (!filter) {
+                return;
+            }
+
+            fetch(`/autocomplete?title=${filter}`)
+                .then((response) => response.json())
+                .then((suggestions) => {
+                    suggestions.forEach(item => {
+                        let suggestion = document.createElement("div");
+                        suggestion.textContent = item.title;
+                        suggestion.onclick = () => {
+                            selectTitle(item.title);
+                            input.value = item.title; 
+                        };
+                        autocompleteList.appendChild(suggestion);
+                    });
+                });
         }
+
+        function selectTitle(title) {
+            fetch(`/search?title=${title}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    document.getElementById("answer-box").innerHTML = "";
+                    data.forEach(row => {
+                        let tempDiv = document.createElement("div");
+                        tempDiv.innerHTML = answerBoxTemplate(row.id, row.title, row.rating, row.price, row.ingredients, row.image);
+                        document.getElementById("answer-box").appendChild(tempDiv);
+                    });
+                    document.getElementById("autocomplete-list").innerHTML = ""; 
+                });
+        }
+
+
             
     </script>
 </body>

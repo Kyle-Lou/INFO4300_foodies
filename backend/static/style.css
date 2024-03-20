@@ -47,14 +47,15 @@
     margin-bottom: 0;
     margin-right: 3px;
 }
-
-.input-box{
+.input-box {
+    position: relative; 
     border-radius: 50px;
-    border:1px solid black;
+    border: 1px solid black;
     display: flex;
+    flex-grow: 1;
     align-items: center;
     margin-top: 10px;
-    padding:12px;
+    padding: 12px;
     width: 600px;
 }
 
@@ -82,10 +83,57 @@
     margin-top:50px; 
 }
 
-.episode-title{
-    font-family: 'Kanit', sans-serif;
+.autocomplete-items {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    top: 100%; 
+    left: 0;
+    right: 0;
+    width: 100%; 
 }
 
-.episode-desc{
-    font-family: 'Montserrat', sans-serif;
+.autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
 }
+
+.autocomplete-items div:hover {
+    background-color: #e9e9e9;
+}
+
+.top-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.checkbox-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: flex-start;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+
+}
+
+.checkbox-container label {
+    margin-bottom: 5px; 
+    display: block; 
+}
+
+#allergyOptions, #ingredientsOptions {
+    margin-top: 5px;
+}
+
+
