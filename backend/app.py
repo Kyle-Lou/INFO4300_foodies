@@ -54,7 +54,7 @@ def detailed_search(query, allergens=None, preferred_ingredients=None):
     # return top_matches
     top_match_tuples = analysis.get_top_matches(query, data, allergens, preferred_ingredients)
     matches = []
-    for jacc_val, data_ind in top_match_tuples:
+    for cos, jacc_val, data_ind in top_match_tuples:
         matches.append(data[data_ind])
     return matches
 
