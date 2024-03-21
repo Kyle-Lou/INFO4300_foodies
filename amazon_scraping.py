@@ -286,7 +286,7 @@ num_of_fails = 0
 # Open a CSV file to write
 with open('snack_info.csv', 'w', newline='', encoding='utf-8') as csvfile:
     writer = csv.writer(csvfile)
-    writer.writerow(['title', 'rating', 'price', 'image', 'description', 'ingredients', 'reviews'])
+    writer.writerow(['title', 'rating', 'price', 'image', 'description', 'ingredients', 'reviews', 'url'])
 
     urls = set(urls)
 
