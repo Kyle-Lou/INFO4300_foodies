@@ -30,17 +30,17 @@
                     <div class="checkbox-group" id="allergies-group">
                         <label><input type="checkbox" id="allergiesCheckbox" onclick="toggleAllergies()"> Allergies?</label>
                         <div id="allergyOptions" style="display:none; margin-left:20px;">
-                            <label><input type="checkbox" name="allergies" value="nuts"> Nuts</label>
-                            <label><input type="checkbox" name="allergies" value="dairy"> Dairy</label>
-                            <label><input type="checkbox" name="allergies" value="gluten"> Gluten</label>
+                            <label><input type="checkbox" name="allergies" value="nuts" onchange="filterAllergies()""> Nuts</label>
+                            <label><input type="checkbox" name="allergies" value="dairy" onchange="filterAllergies()"> Dairy</label>
+                            <label><input type="checkbox" name="allergies" value="gluten" onchange="filterAllergies()"> Gluten</label>
                         </div>
                     </div>
                     <div class="checkbox-group" id="ingredients-group">
                         <label><input type="checkbox" id="ingredientsCheckbox" onclick="toggleIngredients()"> Preferred Ingredients?</label>
                         <div id="ingredientsOptions" style="display:none; margin-left:20px;">
-                            <label><input type="checkbox" name="ingredients" value="chocolate"> Chocolate</label>
-                            <label><input type="checkbox" name="ingredients" value="cheese"> Cheese</label>
-                            <label><input type="checkbox" name="ingredients" value="spice"> Spicy Flavoring</label>
+                            <label><input type="checkbox" name="ingredients" value="chocolate" onchange="filterIngredients()"> Chocolate</label>
+                            <label><input type="checkbox" name="ingredients" value="cheese" onchange="filterIngredients()"> Cheese</label>
+                            <label><input type="checkbox" name="ingredients" value="spice" onchange="filterIngredients()"> Spicy Flavoring</label>
                         </div>
                     </div>
                 </div>
@@ -66,6 +66,7 @@
             </div>`
         }
 
+
         function toggleAllergies() {
             var checkBox = document.getElementById("allergiesCheckbox")
             var allergiesOptions = document.getElementById("allergyOptions");
@@ -75,6 +76,15 @@
             } else {
                 allergiesOptions.style.display = "none"
             }
+        }
+
+        function filterAllergies() {
+            var title = document.getElementById('filter-text-val').value;
+            selectTitle(title);  
+        }
+        function filterIngredients() {
+            var title = document.getElementById('filter-text-val').value;
+            selectTitle(title);  
         }
 
         function toggleIngredients() {
@@ -125,7 +135,10 @@
         }
 
         function selectTitle(title) {
-            fetch(`/search?title=${title}`)
+            var selectedAllergies = Array.from(document.querySelectorAll('input[name="allergies"]:checked')).map(el => el.value);
+            var selectedIngredients = Array.from(document.querySelectorAll('input[name="ingredients"]:checked')).map(el => el.value);
+            var queryParams = new URLSearchParams({ title: title, allergies: selectedAllergies, preferred_ingredients: selectedIngredients });
+            fetch(`/search?${queryParams}`)
                 .then((response) => response.json())
                 .then((data) => {
                     document.getElementById("answer-box").innerHTML = "";

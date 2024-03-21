@@ -1,13 +1,18 @@
 import re
 
 
-def get_top_matches(query, data):
+def get_top_matches(query, data, allergens=None, pref_ingredients=None):
     query_tokens = tokenize(query.lower())
     matches = []
+
     for item_index, item in enumerate(data):
-        tokens = tokenize(item['title'].lower())
-        jaccard_val = jaccard(tokens, query_tokens)
-        matches.append((jaccard_val, item_index))
+        ingredients_tokens = tokenize(item['ingredients'].lower())
+        contains_allergen = any(allergen.lower() in ingredients_tokens for allergen in allergens) if allergens else False 
+        contains_ingredients = all(pref_ingredient.lower() in ingredients_tokens for pref_ingredient in pref_ingredients) if pref_ingredients else True 
+        if not contains_allergen and contains_ingredients:
+            tokens = tokenize(item['title'].lower())
+            jaccard_val = jaccard(tokens, query_tokens)
+            matches.append((jaccard_val, item_index))
     return sorted(matches, key=lambda x: x[0], reverse=True)
 
 

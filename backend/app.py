@@ -39,7 +39,7 @@ def autocomplete_search(query):
     return suggestions
 
 
-def detailed_search(query):
+def detailed_search(query, allergens=None, preferred_ingredients=None):
     # matched_entry = next((item for item in data if item['title'].lower() == title.lower()), None)
     # if not matched_entry:
     #   return []
@@ -52,7 +52,7 @@ def detailed_search(query):
 
     # top_matches = [data[i + 1] for i in top_indices]
     # return top_matches
-    top_match_tuples = analysis.get_top_matches(query, data)
+    top_match_tuples = analysis.get_top_matches(query, data, allergens, preferred_ingredients)
     matches = []
     for jacc_val, data_ind in top_match_tuples:
         matches.append(data[data_ind])
@@ -78,7 +78,15 @@ def autocomplete():
 @app.route("/search")
 def search():
     title = request.args.get("title", "")
-    return jsonify(detailed_search(title))
+    allergies = request.args.getlist('allergies')
+    preferred_ingredients = request.args.getlist('preferred_ingredients')
+    # print(title, allergies, ingredients)
+    allergies = [a.strip().lower() for a in allergies if a.strip()]
+    preferred_ingredients = [i.strip().lower() for i in preferred_ingredients if i.strip()]
+    print(preferred_ingredients)
+    results = detailed_search(title, allergies, preferred_ingredients)
+
+    return jsonify(results)
 
 
 if 'DB_NAME' not in os.environ:
